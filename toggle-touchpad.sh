@@ -1,11 +1,12 @@
 #!/bin/bash
 
-device_id=$( xinput | grep -i touchpad | sed -nre '/Touchpad/s/.*id=([0-9]*).*/\1/p' )
-state=$( xinput list-props "$device_id" | grep -i "device enabled" | grep -o "[01]$" )
+state=$( gsettings list-recursively org.gnome.desktop.peripherals.touchpad | grep -i "send-events" | sed -nre "/send-events/s/.*'([a-z]*)'/\1/p" )
 
-if test $state = '1'
+if test $state = 'enabled'
 then
-	xinput disable "$device_id" && notify-send -i input-touchpad "Toggle Touchpad" "Disabled"
+    gsettings set org.gnome.desktop.peripherals.touchpad send-events disabled
+    notify-send -i input-touchpad "Toggle Touchpad" "Disabled"
 else
-	xinput enable "$device_id" && notify-send -i input-touchpad "Toggle Touchpad" "Enabled"
+    gsettings set org.gnome.desktop.peripherals.touchpad send-events enabled
+    notify-send -i input-touchpad "Toggle Touchpad" "Enabled"
 fi
